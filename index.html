@@ -25,7 +25,6 @@
   --blue:    #4a9eff;
   --radius:  12px;
   --radius-sm: 8px;
-  --header-h: 100px;
 }
 
 body {
@@ -33,7 +32,7 @@ body {
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
   min-height: 100vh;
-  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
   overscroll-behavior: none;
 }
 
@@ -41,1146 +40,864 @@ body {
 .header {
   background: var(--bg2);
   border-bottom: 0.5px solid var(--border);
-  padding: 52px 20px 14px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 52px 20px 16px;
 }
 
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
   margin-bottom: 14px;
 }
 
-.header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
-
-.btn-icon {
-  width: 36px; height: 36px;
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--muted);
-  flex-shrink: 0;
-}
-
-/* Resumen global */
+/* Resumen */
 .summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 0.5px solid var(--border);
 }
-
-.summary-item { }
-.summary-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
-.summary-value { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
-.summary-value.big { font-size: 22px; grid-column: span 2; }
+.summary-total { grid-column: span 2; margin-bottom: 4px; }
+.s-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+.s-value { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+.s-value-sm { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
+.s-sub { font-size: 13px; font-weight: 500; margin-top: 1px; }
 .c-green { color: var(--green); }
 .c-red   { color: var(--red); }
 .c-text  { color: var(--text); }
 .c-muted { color: var(--muted); }
 
-/* ── TABS ────────────────────────────────────────────── */
-.tabs {
-  display: flex;
-  background: var(--bg2);
-  border-bottom: 0.5px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 99;
-}
+/* Tipo de cambio */
+.rate-block { }
+.rate-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.rate-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.rate-value-row { display: flex; align-items: baseline; gap: 8px; }
+.rate-number { font-size: 26px; font-weight: 600; letter-spacing: -0.3px; }
+.rate-badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.badge-ok      { background: rgba(0,192,118,0.15); color: var(--green); }
+.badge-error   { background: rgba(232,64,64,0.15); color: var(--red); }
+.badge-loading { background: rgba(255,255,255,0.07); color: var(--muted); }
+.badge-manual  { background: rgba(74,158,255,0.15); color: var(--blue); }
+.rate-date { font-size: 11px; color: var(--dim); margin-top: 3px; }
 
-.tab {
-  flex: 1;
-  padding: 12px 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  text-align: center;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.tab.active { color: var(--blue); border-bottom-color: var(--blue); }
-
-/* ── SCREENS ─────────────────────────────────────────── */
-.screen { display: none; padding: 16px; }
-.screen.active { display: block; }
-
-/* ── LISTA DE POSICIONES ─────────────────────────────── */
-.positions-list { display: flex; flex-direction: column; gap: 8px; }
-
-.position-card {
-  background: var(--bg2);
+.btn-refresh {
+  background: var(--bg3);
   border: 0.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: background 0.15s;
-  user-select: none;
-}
-
-.position-card:active { background: var(--bg3); }
-.position-card.dragging { opacity: 0.5; border-color: var(--blue); }
-.position-card.drag-over { border-color: var(--blue); background: var(--bg3); }
-
-.drag-handle {
-  color: var(--dim);
-  cursor: grab;
-  padding: 4px;
-  flex-shrink: 0;
-  touch-action: none;
-}
-
-.drag-handle:active { cursor: grabbing; }
-
-.position-info { flex: 1; min-width: 0; }
-
-.position-name {
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.position-ticker {
-  font-size: 11px;
+  border-radius: var(--radius-sm);
   color: var(--muted);
-  margin-top: 1px;
-}
-
-.position-right { text-align: right; flex-shrink: 0; }
-
-.position-price {
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-}
-
-.position-change {
   font-size: 12px;
-  margin-top: 2px;
-  font-weight: 500;
-}
-
-.position-pnl {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 1px;
-}
-
-/* Loading spinner */
-.spinner {
-  width: 14px; height: 14px;
-  border: 2px solid var(--bg3);
-  border-top-color: var(--blue);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Empty state */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--muted);
-}
-
-.empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
-.empty-state h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-.empty-state p { font-size: 14px; line-height: 1.5; }
-
-/* ── BOTÓN AÑADIR ────────────────────────────────────── */
-.fab {
-  position: fixed;
-  bottom: calc(80px + env(safe-area-inset-bottom));
-  right: 20px;
-  width: 52px; height: 52px;
-  background: var(--blue);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+  padding: 6px 12px;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(74,158,255,0.4);
-  z-index: 90;
-  transition: transform 0.15s;
-}
-
-.fab:active { transform: scale(0.93); }
-
-/* ── BOTTOM NAV ──────────────────────────────────────── */
-.bottom-nav {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--bg2);
-  border-top: 0.5px solid var(--border);
-  display: flex;
-  padding-bottom: env(safe-area-inset-bottom);
-  z-index: 100;
-}
-
-.nav-item {
-  flex: 1;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 10px 0;
-  cursor: pointer;
-  color: var(--dim);
-  font-size: 10px;
-  gap: 4px;
-  transition: color 0.15s;
-}
-
-.nav-item.active { color: var(--blue); }
-.nav-item svg { width: 22px; height: 22px; }
-
-/* ── MODAL / OVERLAY ─────────────────────────────────── */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 200;
-  display: none;
-  align-items: flex-end;
-}
-
-.overlay.open { display: flex; }
-
-.sheet {
-  background: var(--bg2);
-  border-radius: 20px 20px 0 0;
-  width: 100%;
-  max-height: 92vh;
-  overflow-y: auto;
-  padding: 8px 0 calc(20px + env(safe-area-inset-bottom));
-  animation: slideUp 0.25s ease;
-}
-
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-.sheet-handle {
-  width: 36px; height: 4px;
-  background: var(--bg4);
-  border-radius: 2px;
-  margin: 8px auto 16px;
-}
-
-.sheet-title {
-  font-size: 17px;
-  font-weight: 600;
-  padding: 0 20px 16px;
-  border-bottom: 0.5px solid var(--border);
-}
-
-.sheet-content { padding: 16px 20px; }
-
-/* ── FORMULARIO ──────────────────────────────────────── */
-.form-group { margin-bottom: 16px; }
-
-.form-label {
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.form-input {
-  width: 100%;
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font-size: 16px;
-  padding: 12px 14px;
-  outline: none;
+  display: flex; align-items: center; gap: 5px;
+  white-space: nowrap; flex-shrink: 0;
   font-family: inherit;
-  transition: border-color 0.15s;
 }
 
-.form-input:focus { border-color: var(--blue); }
-
-.form-input::placeholder { color: var(--dim); }
-
-/* Search results */
-.search-results {
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  margin-top: 4px;
-  overflow: hidden;
-  display: none;
-}
-
-.search-results.open { display: block; }
-
-.search-result-item {
-  padding: 12px 14px;
-  border-bottom: 0.5px solid var(--border);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: background 0.1s;
-}
-
-.search-result-item:last-child { border-bottom: none; }
-.search-result-item:active { background: var(--bg4); }
-
-.result-ticker {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--blue);
-  width: 60px;
-  flex-shrink: 0;
-}
-
-.result-name {
-  font-size: 14px;
-  color: var(--text);
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.result-exchange {
-  font-size: 11px;
-  color: var(--muted);
-  flex-shrink: 0;
-}
-
-/* Botones */
-.btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: var(--radius-sm);
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: opacity 0.15s;
-  border: none;
-}
-
-.btn:active { opacity: 0.8; }
-.btn-primary { background: var(--blue); color: white; }
-.btn-danger  { background: rgba(232,64,64,0.15); color: var(--red); border: 0.5px solid rgba(232,64,64,0.3); }
-.btn-ghost   { background: var(--bg3); color: var(--muted); border: 0.5px solid var(--border); }
-
-.btn-row { display: flex; gap: 8px; margin-top: 8px; }
-.btn-row .btn { flex: 1; }
-
-/* ── PANTALLA DETALLE ────────────────────────────────── */
-.detail-screen {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  z-index: 150;
-  overflow-y: auto;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-  padding-bottom: calc(20px + env(safe-area-inset-bottom));
-}
-
-.detail-screen.open { transform: translateX(0); }
-
-.detail-header {
-  background: var(--bg2);
-  border-bottom: 0.5px solid var(--border);
-  padding: 52px 20px 16px;
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-}
-
-.detail-back {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  color: var(--blue);
-  flex-shrink: 0;
-  margin-bottom: 2px;
-}
-
-.detail-title { flex: 1; min-width: 0; }
-.detail-company { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
-.detail-ticker-badge {
-  display: inline-block;
-  font-size: 11px;
-  color: var(--muted);
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: 4px;
-  padding: 2px 6px;
-  margin-top: 3px;
-}
-
-.detail-content { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-
-/* Card dentro del detalle */
-.detail-card {
-  background: var(--bg2);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-}
-
-.detail-card-title {
-  font-size: 10px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 12px;
-}
-
-.detail-price {
-  font-size: 34px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  margin-bottom: 4px;
-}
-
-.detail-change {
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.detail-metric-label {
-  font-size: 11px;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-
-.detail-metric-value {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-}
-
-/* PnL grande */
-.pnl-display {
-  text-align: center;
-  padding: 8px 0;
-}
-
-.pnl-eur {
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-.pnl-pct {
-  font-size: 18px;
-  font-weight: 500;
-  margin-top: 4px;
-}
-
-/* Notas */
-.notes-textarea {
-  width: 100%;
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font-size: 15px;
-  padding: 12px 14px;
-  outline: none;
-  font-family: inherit;
-  resize: none;
-  min-height: 100px;
-  line-height: 1.5;
-}
-
-.notes-textarea:focus { border-color: var(--blue); }
-.notes-textarea::placeholder { color: var(--dim); }
-
-/* ── PANTALLA DIVISAS ────────────────────────────────── */
-.section-label {
-  font-size: 10px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 4px 0 8px;
-}
-
-.rate-card {
-  background: var(--bg2);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 8px;
-}
-
-.rate-header-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.rate-pair { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
-.rate-value-row { display: flex; align-items: baseline; gap: 6px; }
-.rate-number { font-size: 24px; font-weight: 600; letter-spacing: -0.3px; }
-.rate-badge { font-size: 11px; padding: 2px 7px; border-radius: 20px; font-weight: 500; }
-.badge-ok     { background: rgba(0,192,118,0.15); color: var(--green); }
-.badge-error  { background: rgba(232,64,64,0.15);  color: var(--red); }
-.badge-loading{ background: rgba(255,255,255,0.07); color: var(--muted); }
-.badge-manual { background: rgba(74,158,255,0.15);  color: var(--blue); }
-.rate-date    { font-size: 11px; color: var(--dim); margin-top: 2px; }
-
-.btn-refresh-sm {
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--muted);
-  font-size: 11px;
-  padding: 5px 10px;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* Toggle */
-.toggle-row {
+.manual-toggle {
   display: flex; align-items: center; gap: 10px;
-  margin-top: 12px; padding-top: 12px;
+  margin-top: 10px; padding-top: 10px;
   border-top: 0.5px solid var(--border);
   cursor: pointer;
 }
-
-.toggle-label { font-size: 13px; color: var(--muted); flex: 1; }
+.manual-toggle label { font-size: 13px; color: var(--muted); flex: 1; cursor: pointer; }
 
 .toggle-switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
 .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
 .toggle-track {
   position: absolute; inset: 0;
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: 20px;
-  cursor: pointer;
+  background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: 20px; cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
 }
 .toggle-track::after {
-  content: '';
-  position: absolute;
-  left: 3px; top: 3px;
-  width: 16px; height: 16px;
-  background: var(--muted);
-  border-radius: 50%;
+  content: ''; position: absolute;
+  left: 3px; top: 3px; width: 16px; height: 16px;
+  background: var(--muted); border-radius: 50%;
   transition: transform 0.2s, background 0.2s;
 }
 .toggle-switch input:checked + .toggle-track { background: rgba(74,158,255,0.2); border-color: var(--blue); }
 .toggle-switch input:checked + .toggle-track::after { transform: translateX(18px); background: var(--blue); }
 
-.manual-wrap {
-  overflow: hidden; max-height: 0;
-  transition: max-height 0.25s ease, opacity 0.2s;
-  opacity: 0;
-}
+.manual-wrap { overflow: hidden; max-height: 0; transition: max-height 0.25s ease, opacity 0.2s; opacity: 0; }
 .manual-wrap.open { max-height: 80px; opacity: 1; }
 
-.manual-input-row {
-  display: flex; align-items: center; gap: 10px;
-  margin-top: 12px;
-}
+.manual-input-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
 .manual-input-row label { font-size: 13px; color: var(--muted); white-space: nowrap; }
 .manual-input-row input {
-  flex: 1;
-  background: var(--bg3);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font-size: 17px; font-weight: 500;
-  padding: 8px 12px;
-  outline: none; text-align: right;
-  font-family: inherit;
+  flex: 1; background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-size: 17px; font-weight: 500; padding: 8px 12px;
+  outline: none; text-align: right; font-family: inherit;
 }
 .manual-input-row input:focus { border-color: var(--blue); }
 .manual-unit { font-size: 13px; color: var(--muted); }
 
-.refresh-all-btn {
-  width: 100%;
-  background: var(--bg2);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--blue);
-  font-size: 14px; font-weight: 500;
-  padding: 12px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-  margin-bottom: 16px;
-  font-family: inherit;
-}
+/* ── CONTENT ─────────────────────────────────────────── */
+.content { padding: 16px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-title { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* SVG icons */
-svg.icon {
-  width: 16px; height: 16px;
-  fill: none; stroke: currentColor;
-  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-  vertical-align: -3px; flex-shrink: 0;
-}
-
-/* Storage badge */
-.storage-note {
+/* Indicador de actualización */
+.refresh-indicator {
   font-size: 11px; color: var(--dim);
-  text-align: center; margin-top: 12px; line-height: 1.6;
+  display: flex; align-items: center; gap: 5px;
 }
+.refresh-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--dim); transition: background 0.3s;
+}
+.refresh-dot.active { background: var(--green); }
+
+/* ── POSICIONES ──────────────────────────────────────── */
+.positions-list { display: flex; flex-direction: column; gap: 8px; }
+
+.position-card {
+  background: var(--bg2); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.pos-order-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+.order-btn {
+  width: 26px; height: 22px; background: var(--bg3);
+  border: 0.5px solid var(--border); border-radius: 4px;
+  color: var(--dim); font-size: 11px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.15s, background 0.15s;
+}
+.order-btn:active { background: var(--bg4); color: var(--text); }
+.order-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+.pos-info { flex: 1; min-width: 0; cursor: pointer; }
+.pos-name { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pos-ticker { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+.pos-right { text-align: right; flex-shrink: 0; cursor: pointer; min-width: 100px; }
+.pos-price { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+.pos-change { font-size: 12px; font-weight: 500; margin-top: 2px; }
+.pos-pnl { font-size: 12px; margin-top: 1px; }
+
+.spinner {
+  width: 13px; height: 13px;
+  border: 2px solid var(--bg3); border-top-color: var(--blue);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  display: inline-block; vertical-align: -2px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.empty-state p { font-size: 14px; line-height: 1.5; }
+
+/* ── FAB ─────────────────────────────────────────────── */
+.fab {
+  position: fixed; bottom: calc(24px + env(safe-area-inset-bottom)); right: 20px;
+  width: 52px; height: 52px; background: var(--blue); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(74,158,255,0.4);
+  z-index: 90; transition: transform 0.15s;
+}
+.fab:active { transform: scale(0.93); }
+
+/* ── OVERLAY / SHEET ─────────────────────────────────── */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: flex-end; }
+.overlay.open { display: flex; }
+
+.sheet {
+  background: var(--bg2); border-radius: 20px 20px 0 0; width: 100%;
+  max-height: 92vh; overflow-y: auto;
+  padding: 8px 0 calc(24px + env(safe-area-inset-bottom));
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.sheet-handle { width: 36px; height: 4px; background: var(--bg4); border-radius: 2px; margin: 8px auto 16px; }
+.sheet-title { font-size: 17px; font-weight: 600; padding: 0 20px 16px; border-bottom: 0.5px solid var(--border); }
+.sheet-content { padding: 16px 20px; }
+
+/* ── FORM ────────────────────────────────────────────── */
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+.form-input {
+  width: 100%; background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 16px;
+  padding: 12px 14px; outline: none; font-family: inherit; transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--blue); }
+.form-input::placeholder { color: var(--dim); }
+
+.search-results { background: var(--bg3); border: 0.5px solid var(--border); border-radius: var(--radius-sm); margin-top: 4px; overflow: hidden; display: none; }
+.search-results.open { display: block; }
+.search-result-item { padding: 12px 14px; border-bottom: 0.5px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:active { background: var(--bg4); }
+.result-ticker { font-size: 14px; font-weight: 600; color: var(--blue); width: 80px; flex-shrink: 0; }
+.result-name { font-size: 14px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.result-type { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+.hint-box { background: var(--bg3); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.hint-box span { color: var(--text); font-weight: 500; }
+
+.shares-row {
+  background: var(--bg3); border-radius: var(--radius-sm);
+  padding: 10px 14px; margin-bottom: 16px;
+  font-size: 14px; color: var(--muted);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.shares-row input {
+  background: transparent; border: none; border-bottom: 1px solid var(--border);
+  color: var(--text); font-size: 15px; width: 100px;
+  outline: none; padding: 2px 4px; font-family: inherit;
+}
+
+.btn { width: 100%; padding: 14px; border-radius: var(--radius-sm); font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; border: none; margin-bottom: 0; }
+.btn:active { opacity: 0.8; }
+.btn-primary { background: var(--blue); color: white; }
+.btn-danger  { background: rgba(232,64,64,0.15); color: var(--red); border: 0.5px solid rgba(232,64,64,0.3); }
+.btn-ghost   { background: var(--bg3); color: var(--muted); border: 0.5px solid var(--border); }
+.btn-row { display: flex; gap: 8px; margin-top: 8px; }
+.btn-row .btn { flex: 1; }
+
+/* ── DETALLE ─────────────────────────────────────────── */
+.detail-screen {
+  position: fixed; inset: 0; background: var(--bg); z-index: 150;
+  overflow-y: auto; transform: translateX(100%); transition: transform 0.3s ease;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+.detail-screen.open { transform: translateX(0); }
+
+.detail-header {
+  background: var(--bg2); border-bottom: 0.5px solid var(--border);
+  padding: 52px 16px 16px; display: flex; align-items: flex-end; gap: 10px;
+}
+.detail-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--blue); flex-shrink: 0; margin-bottom: 2px; }
+.detail-title { flex: 1; min-width: 0; }
+.detail-company { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.detail-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); background: var(--bg3); border: 0.5px solid var(--border); border-radius: 4px; padding: 2px 7px; margin-top: 4px; }
+.manual-price-badge { background: rgba(240,165,0,0.1); color: var(--gold); border-color: rgba(240,165,0,0.2); }
+.edit-btn { width: 34px; height: 34px; background: var(--bg3); border: 0.5px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); flex-shrink: 0; }
+
+.detail-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.d-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.d-card-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+.d-price { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; }
+.d-change { font-size: 15px; font-weight: 500; }
+.d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.d-metric-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.d-metric-value { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
+.pnl-big { text-align: center; padding: 8px 0; }
+.pnl-eur { font-size: 36px; font-weight: 700; letter-spacing: -0.5px; }
+.pnl-pct { font-size: 18px; font-weight: 500; margin-top: 4px; }
+
+.notes-textarea { width: 100%; background: var(--bg3); border: 0.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 15px; padding: 12px 14px; outline: none; font-family: inherit; resize: none; min-height: 90px; line-height: 1.5; }
+.notes-textarea:focus { border-color: var(--blue); }
+.notes-textarea::placeholder { color: var(--dim); }
+
+.manual-price-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.manual-price-row label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.manual-price-row input { flex: 1; background: var(--bg3); border: 0.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 17px; font-weight: 500; padding: 8px 12px; outline: none; text-align: right; font-family: inherit; }
+.manual-price-row input:focus { border-color: var(--gold); }
+.manual-price-row .curr { font-size: 13px; color: var(--muted); }
+
+svg.icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; flex-shrink: 0; }
 </style>
 </head>
 <body>
 
-<!-- ── HEADER ──────────────────────────────────────────── -->
-<div class="header" id="main-header">
-  <div class="header-top">
-    <h1>Mi Cartera</h1>
-    <div class="btn-icon" onclick="refreshPrices()" title="Actualizar precios">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+<!-- HEADER -->
+<div class="header">
+  <h1>Mi Cartera</h1>
+
+  <div class="summary">
+    <div class="summary-total">
+      <div class="s-label">Valor total</div>
+      <div class="s-value c-text" id="sum-total">— €</div>
+    </div>
+    <div>
+      <div class="s-label">Hoy</div>
+      <div class="s-value-sm c-muted" id="sum-day-eur">—</div>
+      <div class="s-sub c-muted" id="sum-day-pct">—</div>
+    </div>
+    <div>
+      <div class="s-label">Total</div>
+      <div class="s-value-sm c-muted" id="sum-pnl-eur">—</div>
+      <div class="s-sub c-muted" id="sum-pnl-pct">—</div>
     </div>
   </div>
-  <div class="summary" id="summary-block">
-    <div class="summary-item" style="grid-column: span 2">
-      <div class="summary-label">Valor total</div>
-      <div class="summary-value big c-text" id="sum-total">—</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Hoy</div>
-      <div class="summary-value c-muted" id="sum-day-eur">—</div>
-      <div class="summary-value" style="font-size:13px" id="sum-day-pct">—</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Total</div>
-      <div class="summary-value c-muted" id="sum-total-eur">—</div>
-      <div class="summary-value" style="font-size:13px" id="sum-total-pct">—</div>
-    </div>
-  </div>
-</div>
 
-<!-- ── MAIN CONTENT ────────────────────────────────────── -->
-<div class="screen active" id="screen-cartera">
-  <div class="positions-list" id="positions-list">
-    <div class="empty-state" id="empty-state">
-      <div class="empty-icon">📈</div>
-      <h3>Tu cartera está vacía</h3>
-      <p>Pulsa el botón + para añadir tu primera posición.</p>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-divisas">
-  <p class="section-label">Tipos de cambio a EUR</p>
-
-  <button class="refresh-all-btn" onclick="refreshAllRates()">
-    <svg class="icon" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-    Actualizar todos los automáticos
-  </button>
-
-  <!-- USD -->
-  <div class="rate-card">
-    <div class="rate-header-row">
+  <div class="rate-block">
+    <div class="rate-top">
       <div>
-        <div class="rate-pair">USD → EUR</div>
+        <p class="rate-label">Tipo de cambio USD → EUR</p>
         <div class="rate-value-row">
-          <span class="rate-number" id="rate-usd-num">—</span>
-          <span class="rate-badge badge-loading" id="rate-usd-badge">cargando</span>
+          <span class="rate-number" id="rate-number">—</span>
+          <span class="rate-badge badge-loading" id="rate-badge">cargando</span>
         </div>
-        <div class="rate-date" id="rate-usd-date">Banco Central Europeo</div>
+        <p class="rate-date" id="rate-date">Banco Central Europeo</p>
       </div>
+      <button class="btn-refresh" onclick="fetchRate(true)">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Actualizar
+      </button>
     </div>
-    <div class="toggle-row" onclick="toggleManual('usd')">
-      <span class="toggle-label">Tipo de cambio manual</span>
+    <div class="manual-toggle" onclick="document.getElementById('manual-toggle').click()">
+      <label for="manual-toggle">Tipo de cambio manual</label>
       <div class="toggle-switch">
-        <input type="checkbox" id="toggle-usd" onclick="event.stopPropagation(); toggleManual('usd')">
+        <input type="checkbox" id="manual-toggle" onclick="event.stopPropagation(); toggleManual()">
         <div class="toggle-track"></div>
       </div>
     </div>
-    <div class="manual-wrap" id="manual-usd">
+    <div class="manual-wrap" id="manual-wrap">
       <div class="manual-input-row">
         <label>1 USD =</label>
-        <input type="number" id="manual-usd-val" placeholder="0.0000" step="0.0001" inputmode="decimal" oninput="applyManual('usd')">
+        <input type="number" id="manual-rate" placeholder="0.8800" step="0.0001" min="0.01" max="10" inputmode="decimal" oninput="applyManualRate()">
         <span class="manual-unit">EUR</span>
       </div>
     </div>
-  </div>
-
-  <!-- GBP -->
-  <div class="rate-card">
-    <div class="rate-header-row">
-      <div>
-        <div class="rate-pair">GBP → EUR</div>
-        <div class="rate-value-row">
-          <span class="rate-number" id="rate-gbp-num">—</span>
-          <span class="rate-badge badge-loading" id="rate-gbp-badge">cargando</span>
-        </div>
-        <div class="rate-date" id="rate-gbp-date">Banco Central Europeo</div>
-      </div>
-    </div>
-    <div class="toggle-row" onclick="toggleManual('gbp')">
-      <span class="toggle-label">Tipo de cambio manual</span>
-      <div class="toggle-switch">
-        <input type="checkbox" id="toggle-gbp" onclick="event.stopPropagation(); toggleManual('gbp')">
-        <div class="toggle-track"></div>
-      </div>
-    </div>
-    <div class="manual-wrap" id="manual-gbp">
-      <div class="manual-input-row">
-        <label>1 GBP =</label>
-        <input type="number" id="manual-gbp-val" placeholder="0.0000" step="0.0001" inputmode="decimal" oninput="applyManual('gbp')">
-        <span class="manual-unit">EUR</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- JPY -->
-  <div class="rate-card">
-    <div class="rate-header-row">
-      <div>
-        <div class="rate-pair">JPY → EUR</div>
-        <div class="rate-value-row">
-          <span class="rate-number" id="rate-jpy-num">—</span>
-          <span class="rate-badge badge-loading" id="rate-jpy-badge">cargando</span>
-        </div>
-        <div class="rate-date" id="rate-jpy-date">Banco Central Europeo</div>
-      </div>
-    </div>
-    <div class="toggle-row" onclick="toggleManual('jpy')">
-      <span class="toggle-label">Tipo de cambio manual</span>
-      <div class="toggle-switch">
-        <input type="checkbox" id="toggle-jpy" onclick="event.stopPropagation(); toggleManual('jpy')">
-        <div class="toggle-track"></div>
-      </div>
-    </div>
-    <div class="manual-wrap" id="manual-jpy">
-      <div class="manual-input-row">
-        <label>1 JPY =</label>
-        <input type="number" id="manual-jpy-val" placeholder="0.000000" step="0.000001" inputmode="decimal" oninput="applyManual('jpy')">
-        <span class="manual-unit">EUR</span>
-      </div>
-    </div>
-  </div>
-
-  <p class="storage-note">Tipos de cambio del Banco Central Europeo<br>Se actualizan cada día hábil a las 16:00 CET</p>
-</div>
-
-<!-- ── BOTTOM NAV ──────────────────────────────────────── -->
-<div class="bottom-nav">
-  <div class="nav-item active" id="nav-cartera" onclick="showScreen('cartera')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-    </svg>
-    Cartera
-  </div>
-  <div class="nav-item" id="nav-divisas" onclick="showScreen('divisas')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-    </svg>
-    Divisas
   </div>
 </div>
 
-<!-- ── FAB ────────────────────────────────────────────── -->
-<div class="fab" id="fab" onclick="openAddSheet()">
+<!-- LISTA -->
+<div class="content">
+  <div class="section-header">
+    <span class="section-title">Posiciones</span>
+    <div class="refresh-indicator">
+      <div class="refresh-dot" id="refresh-dot"></div>
+      <span id="refresh-label">—</span>
+    </div>
+  </div>
+  <div class="positions-list" id="positions-list"></div>
+</div>
+
+<!-- FAB -->
+<div class="fab" onclick="openAddSheet()">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
   </svg>
 </div>
 
-<!-- ── SHEET AÑADIR ───────────────────────────────────── -->
+<!-- SHEET AÑADIR -->
 <div class="overlay" id="overlay-add" onclick="closeAddSheet()">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="add-sheet-title">Añadir posición</div>
+    <div class="sheet-title" id="add-title">Añadir posición</div>
     <div class="sheet-content">
-
-      <!-- Paso 1: buscar -->
       <div id="step-search">
         <div class="form-group">
           <label class="form-label">Empresa o ticker</label>
           <input type="text" class="form-input" id="search-input"
             placeholder="ej. Apple, AAPL, Santander…"
-            oninput="onSearchInput()" autocomplete="off" autocorrect="off">
+            oninput="onSearchInput()" autocomplete="off" autocorrect="off" spellcheck="false">
           <div class="search-results" id="search-results"></div>
         </div>
       </div>
-
-      <!-- Paso 2: datos de compra -->
       <div id="step-data" style="display:none">
-        <div id="selected-company-label" style="font-size:14px;color:var(--muted);margin-bottom:16px;padding:10px 14px;background:var(--bg3);border-radius:var(--radius-sm)"></div>
-
+        <div class="hint-box" id="selected-hint"></div>
         <div class="form-group">
-          <label class="form-label">Precio de compra por acción</label>
+          <label class="form-label">Precio de compra por acción (EUR)</label>
           <input type="number" class="form-input" id="input-buy-price"
-            placeholder="ej. 182.50" step="0.01" inputmode="decimal"
-            oninput="calcShares()">
-          <div style="font-size:11px;color:var(--muted);margin-top:4px" id="buy-price-currency-hint"></div>
+            placeholder="0.00" step="0.01" inputmode="decimal" oninput="calcShares()">
         </div>
-
         <div class="form-group">
-          <label class="form-label">Capital invertido (€)</label>
+          <label class="form-label">Capital invertido (EUR)</label>
           <input type="number" class="form-input" id="input-capital"
-            placeholder="ej. 5000" step="1" inputmode="decimal"
-            oninput="calcShares()">
+            placeholder="ej. 5000" step="1" inputmode="decimal" oninput="calcShares()">
         </div>
-
-        <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:14px;color:var(--muted)">
-          Acciones: <span id="calc-shares" style="color:var(--text);font-weight:600">—</span>
-          &nbsp;·&nbsp; O introduce directamente:
-          <input type="number" id="input-shares-direct" placeholder="nº acciones" step="0.000001"
-            style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;width:90px;outline:none;margin-left:4px;padding:2px 4px"
-            inputmode="decimal" oninput="onSharesDirect()">
+        <div class="shares-row">
+          <span>Acciones: <span id="calc-shares" style="color:var(--text);font-weight:600">—</span></span>
+          <span style="color:var(--dim)">·</span>
+          <span>O introduce directamente:</span>
+          <input type="number" id="input-shares-direct" placeholder="nº acc." step="0.000001" inputmode="decimal" oninput="onSharesDirect()">
         </div>
-
         <div class="form-group">
           <label class="form-label">Notas (opcional)</label>
-          <textarea class="notes-textarea" id="input-notes" placeholder="Fecha de compra, estrategia, observaciones…" rows="3"></textarea>
+          <textarea class="notes-textarea" id="input-notes" placeholder="Fecha de compra, estrategia…" rows="3"></textarea>
         </div>
-
         <div class="btn-row">
           <button class="btn btn-ghost" onclick="backToSearch()">← Volver</button>
           <button class="btn btn-primary" onclick="savePosition()">Guardar</button>
         </div>
       </div>
-
     </div>
   </div>
 </div>
 
-<!-- ── DETALLE DE POSICIÓN ────────────────────────────── -->
-<div class="detail-screen" id="detail-screen">
-  <div class="detail-header">
-    <div class="detail-back" onclick="closeDetail()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-    </div>
-    <div class="detail-title">
-      <div class="detail-company" id="detail-company">—</div>
-      <div class="detail-ticker-badge" id="detail-ticker">—</div>
-    </div>
-    <div class="btn-icon" onclick="openEditSheet()" title="Editar">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-    </div>
-  </div>
-
-  <div class="detail-content">
-    <!-- Precio actual -->
-    <div class="detail-card">
-      <div class="detail-card-title">Precio actual</div>
-      <div class="detail-price" id="detail-price">—</div>
-      <div class="detail-change" id="detail-change">—</div>
-    </div>
-
-    <!-- Tu posición -->
-    <div class="detail-card">
-      <div class="detail-card-title">Tu posición</div>
-      <div class="detail-grid">
-        <div>
-          <div class="detail-metric-label">Capital invertido</div>
-          <div class="detail-metric-value" id="detail-invested">—</div>
-        </div>
-        <div>
-          <div class="detail-metric-label">Acciones</div>
-          <div class="detail-metric-value" id="detail-shares">—</div>
-        </div>
-        <div>
-          <div class="detail-metric-label">Precio de compra</div>
-          <div class="detail-metric-value" id="detail-buy-price">—</div>
-        </div>
-        <div>
-          <div class="detail-metric-label">Valor actual</div>
-          <div class="detail-metric-value" id="detail-current-value">—</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Beneficio / Pérdida -->
-    <div class="detail-card">
-      <div class="detail-card-title">Resultado</div>
-      <div class="pnl-display">
-        <div class="pnl-eur" id="detail-pnl-eur">—</div>
-        <div class="pnl-pct" id="detail-pnl-pct">—</div>
-      </div>
-    </div>
-
-    <!-- Notas -->
-    <div class="detail-card">
-      <div class="detail-card-title">Notas</div>
-      <textarea class="notes-textarea" id="detail-notes" placeholder="Sin notas. Pulsa editar para añadir."
-        oninput="saveNotes()" rows="4"></textarea>
-    </div>
-
-    <!-- Eliminar -->
-    <button class="btn btn-danger" onclick="confirmDelete()">Eliminar posición</button>
-  </div>
-</div>
-
-<!-- ── SHEET EDITAR ───────────────────────────────────── -->
+<!-- SHEET EDITAR -->
 <div class="overlay" id="overlay-edit" onclick="closeEditSheet()">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
     <div class="sheet-title">Editar posición</div>
     <div class="sheet-content">
       <div class="form-group">
-        <label class="form-label">Precio de compra por acción</label>
+        <label class="form-label">Precio de compra por acción (EUR)</label>
         <input type="number" class="form-input" id="edit-buy-price" step="0.01" inputmode="decimal" oninput="editCalcShares()">
-        <div style="font-size:11px;color:var(--muted);margin-top:4px" id="edit-currency-hint"></div>
       </div>
       <div class="form-group">
-        <label class="form-label">Capital invertido (€)</label>
+        <label class="form-label">Capital invertido (EUR)</label>
         <input type="number" class="form-input" id="edit-capital" step="1" inputmode="decimal" oninput="editCalcShares()">
       </div>
-      <div style="background:var(--bg3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:14px;color:var(--muted)">
-        Acciones: <span id="edit-calc-shares" style="color:var(--text);font-weight:600">—</span>
-        &nbsp;·&nbsp; O introduce directamente:
-        <input type="number" id="edit-shares-direct" step="0.000001"
-          style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-size:14px;width:90px;outline:none;margin-left:4px;padding:2px 4px"
-          inputmode="decimal" oninput="editOnSharesDirect()">
+      <div class="shares-row">
+        <span>Acciones: <span id="edit-calc-shares" style="color:var(--text);font-weight:600">—</span></span>
+        <span style="color:var(--dim)">·</span>
+        <span>O directamente:</span>
+        <input type="number" id="edit-shares-direct" step="0.000001" inputmode="decimal" oninput="editOnSharesDirect()">
       </div>
       <button class="btn btn-primary" onclick="saveEdit()">Guardar cambios</button>
     </div>
   </div>
 </div>
 
+<!-- DETALLE -->
+<div class="detail-screen" id="detail-screen">
+  <div class="detail-header">
+    <div class="detail-back" onclick="closeDetail()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="detail-title">
+      <div class="detail-company" id="d-company">—</div>
+      <div class="detail-badge" id="d-badge">—</div>
+    </div>
+    <div class="edit-btn" onclick="openEditSheet()">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </div>
+  </div>
+
+  <div class="detail-body">
+    <div class="d-card">
+      <div class="d-card-label">Precio actual</div>
+      <div class="d-price" id="d-price">—</div>
+      <div class="d-change c-muted" id="d-change">—</div>
+      <div id="d-manual-price-block" style="display:none; margin-top:12px; padding-top:12px; border-top:0.5px solid var(--border)">
+        <div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Actualizar precio</div>
+        <div class="manual-price-row">
+          <label id="d-manual-label">Precio actual (EUR)</label>
+          <input type="number" id="d-manual-input" placeholder="0.00" step="0.01" inputmode="decimal">
+          <span class="curr" id="d-manual-curr">EUR</span>
+        </div>
+        <button class="btn btn-ghost" style="margin-top:8px;font-size:14px;padding:10px" onclick="applyManualPrice()">Aplicar</button>
+      </div>
+    </div>
+
+    <div class="d-card">
+      <div class="d-card-label">Tu posición</div>
+      <div class="d-grid">
+        <div><div class="d-metric-label">Capital invertido</div><div class="d-metric-value" id="d-invested">—</div></div>
+        <div><div class="d-metric-label">Acciones</div><div class="d-metric-value" id="d-shares">—</div></div>
+        <div><div class="d-metric-label">Precio compra</div><div class="d-metric-value" id="d-buy-price">—</div></div>
+        <div><div class="d-metric-label">Valor actual</div><div class="d-metric-value" id="d-cur-value">—</div></div>
+      </div>
+    </div>
+
+    <div class="d-card">
+      <div class="d-card-label">Resultado</div>
+      <div class="pnl-big">
+        <div class="pnl-eur c-muted" id="d-pnl-eur">—</div>
+        <div class="pnl-pct c-muted" id="d-pnl-pct">—</div>
+      </div>
+    </div>
+
+    <div class="d-card">
+      <div class="d-card-label">Notas</div>
+      <textarea class="notes-textarea" id="d-notes" placeholder="Sin notas. Escribe aquí tus anotaciones." oninput="saveNotes()" rows="4"></textarea>
+    </div>
+
+    <button class="btn btn-danger" onclick="confirmDelete()">Eliminar posición</button>
+  </div>
+</div>
+
 <script>
-// ═══════════════════════════════════════════════════════
-// ESTADO
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
 const FINNHUB_KEY = 'd8qm6a1r01qrf6e2atfgd8qm6a1r01qrf6e2atg0';
+const AUTO_REFRESH_MS = 120000; // 2 minutos
+const RATE_RETRY_MS   = 60000;  // reintentar tipo cambio cada 60s si falla
 
-let positions = [];      // [{id, ticker, name, currency, buyPrice, capital, shares, notes}]
-let rates = { USD: null, GBP: null, JPY: null };
-let manualRates = { usd: false, gbp: false, jpy: false };
-let currentDetail = null; // posición abierta en detalle
-let searchTimeout = null;
-let dragSrc = null;
+// ═══════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════
+let positions    = [];
+let usdEurRate   = null;
+let isManual     = false;
+let priceCache   = {};
+let currentDetail = null;
+let selectedTicker = null, selectedName = null, selectedCurrency = null;
+let searchTimeout  = null;
+let autoRefreshTimer = null;
+let rateRetryTimer   = null;
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // PERSISTENCIA
-// ═══════════════════════════════════════════════════════
-function save() {
+// ═══════════════════════════════════════
+function persist() {
   try {
-    localStorage.setItem('cartera_positions', JSON.stringify(positions));
-    localStorage.setItem('cartera_rates_manual', JSON.stringify(manualRates));
+    localStorage.setItem('crt_positions', JSON.stringify(positions));
+    localStorage.setItem('crt_prices',    JSON.stringify(priceCache));
+    localStorage.setItem('crt_manual',    isManual ? '1' : '0');
+    const mv = document.getElementById('manual-rate').value;
+    if (mv) localStorage.setItem('crt_manual_rate', mv);
   } catch(e) {}
 }
 
-function load() {
+function restore() {
   try {
-    const p = localStorage.getItem('cartera_positions');
-    if (p) positions = JSON.parse(p);
-    const m = localStorage.getItem('cartera_rates_manual');
-    if (m) manualRates = JSON.parse(m);
+    const p  = localStorage.getItem('crt_positions');
+    const pc = localStorage.getItem('crt_prices');
+    const m  = localStorage.getItem('crt_manual');
+    const mv = localStorage.getItem('crt_manual_rate');
+    if (p)  positions   = JSON.parse(p);
+    if (pc) priceCache  = JSON.parse(pc);
+    isManual = m === '1';
+    if (isManual && mv) {
+      usdEurRate = parseFloat(mv);
+      document.getElementById('manual-toggle').checked = true;
+      document.getElementById('manual-wrap').className = 'manual-wrap open';
+      document.getElementById('manual-rate').value = mv;
+      setRateBadge('manual');
+      document.getElementById('rate-number').textContent = parseFloat(mv).toFixed(4);
+      document.getElementById('rate-date').textContent = 'Tipo de cambio manual';
+    }
   } catch(e) {}
 }
 
-// ═══════════════════════════════════════════════════════
-// NAVEGACIÓN
-// ═══════════════════════════════════════════════════════
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
-  document.getElementById('fab').style.display = name === 'cartera' ? 'flex' : 'none';
+// ═══════════════════════════════════════
+// TIPO DE CAMBIO
+// ═══════════════════════════════════════
+function setRateBadge(state) {
+  const badge = document.getElementById('rate-badge');
+  const map = {
+    loading: ['badge-loading','cargando'],
+    ok:      ['badge-ok','en directo'],
+    error:   ['badge-error','sin conexión'],
+    manual:  ['badge-manual','manual'],
+  };
+  badge.className = 'rate-badge ' + map[state][0];
+  badge.textContent = map[state][1];
 }
 
-// ═══════════════════════════════════════════════════════
-// TIPOS DE CAMBIO
-// ═══════════════════════════════════════════════════════
-async function fetchRate(currency) {
-  const key = currency.toLowerCase();
-  if (manualRates[key]) return;
-
-  const num    = document.getElementById(`rate-${key}-num`);
-  const badge  = document.getElementById(`rate-${key}-badge`);
-  const date   = document.getElementById(`rate-${key}-date`);
-
-  badge.className = 'rate-badge badge-loading';
-  badge.textContent = 'cargando';
+async function fetchRate(force = false) {
+  if (isManual && !force) return;
+  if (force && isManual) {
+    // Forzar salir de manual y reconectar
+    isManual = false;
+    document.getElementById('manual-toggle').checked = false;
+    document.getElementById('manual-wrap').className = 'manual-wrap';
+  }
+  clearTimeout(rateRetryTimer);
+  setRateBadge('loading');
 
   const apis = [
     async () => {
-      const r = await fetch(`https://api.frankfurter.app/latest?from=${currency}&to=EUR`);
+      const r = await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR', { cache: 'no-store' });
       const d = await r.json();
       return { rate: d.rates.EUR, date: 'BCE · ' + d.date };
     },
     async () => {
-      const r = await fetch(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currency.toLowerCase()}.json`);
+      const r = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json', { cache: 'no-store' });
       const d = await r.json();
-      return { rate: d[currency.toLowerCase()].eur, date: 'BCE · ' + d.date };
+      return { rate: d.usd.eur, date: 'BCE · ' + d.date };
+    },
+    async () => {
+      const r = await fetch('https://open.er-api.com/v6/latest/USD', { cache: 'no-store' });
+      const d = await r.json();
+      return { rate: d.rates.EUR, date: 'ER-API · ' + new Date().toISOString().slice(0,10) };
     }
   ];
 
   for (const fn of apis) {
     try {
-      const { rate, date: rd } = await fn();
+      const { rate, date } = await fn();
       if (rate && rate > 0) {
-        rates[currency] = rate;
-        num.textContent = currency === 'JPY' ? rate.toFixed(6) : rate.toFixed(4);
-        badge.className = 'rate-badge badge-ok';
-        badge.textContent = 'en directo';
-        date.textContent = rd;
-        renderPositions();
+        usdEurRate = rate;
+        document.getElementById('rate-number').textContent = rate.toFixed(4);
+        document.getElementById('rate-date').textContent = date;
+        setRateBadge('ok');
+        renderAll();
         return;
       }
     } catch(e) {}
   }
 
-  badge.className = 'rate-badge badge-error';
-  badge.textContent = 'sin conexión';
-  num.textContent = '—';
-  date.textContent = 'Activa el modo manual para continuar';
+  // Todas fallaron
+  setRateBadge('error');
+  document.getElementById('rate-date').textContent = 'Sin conexión · Activa el modo manual';
+  // Reintentar automáticamente en 60s
+  rateRetryTimer = setTimeout(() => fetchRate(), RATE_RETRY_MS);
 }
 
-function refreshAllRates() {
-  ['USD','GBP','JPY'].forEach(c => {
-    if (!manualRates[c.toLowerCase()]) fetchRate(c);
-  });
-}
-
-function toggleManual(key) {
-  const cb = document.getElementById(`toggle-${key}`);
-  const isOn = cb.checked;
-  manualRates[key] = isOn;
-  const wrap = document.getElementById(`manual-${key}`);
-  wrap.className = isOn ? 'manual-wrap open' : 'manual-wrap';
-
-  const badge = document.getElementById(`rate-${key}-badge`);
-  const date  = document.getElementById(`rate-${key}-date`);
-
-  if (isOn) {
-    badge.className = 'rate-badge badge-manual';
-    badge.textContent = 'manual';
-    date.textContent = 'Tipo de cambio introducido manualmente';
-    applyManual(key);
+function toggleManual() {
+  isManual = document.getElementById('manual-toggle').checked;
+  document.getElementById('manual-wrap').className = isManual ? 'manual-wrap open' : 'manual-wrap';
+  if (isManual) {
+    setRateBadge('manual');
+    document.getElementById('rate-date').textContent = 'Tipo de cambio manual';
+    applyManualRate();
   } else {
-    rates[key.toUpperCase()] = null;
-    document.getElementById(`manual-${key}-val`).value = '';
-    fetchRate(key.toUpperCase());
+    clearTimeout(rateRetryTimer);
+    document.getElementById('manual-rate').value = '';
+    usdEurRate = null;
+    fetchRate();
   }
-  save();
+  persist();
 }
 
-function applyManual(key) {
-  const val = parseFloat(document.getElementById(`manual-${key}-val`).value);
+function applyManualRate() {
+  const val = parseFloat(document.getElementById('manual-rate').value);
   if (val && val > 0) {
-    rates[key.toUpperCase()] = val;
-    const num = document.getElementById(`rate-${key}-num`);
-    num.textContent = key === 'jpy' ? val.toFixed(6) : val.toFixed(4);
-    renderPositions();
+    usdEurRate = val;
+    document.getElementById('rate-number').textContent = val.toFixed(4);
+    renderAll();
+    persist();
   }
 }
 
-function toEur(amount, currency) {
-  if (!currency || currency === 'EUR') return amount;
-  const rate = rates[currency.toUpperCase()];
-  if (!rate) return null;
-  return amount * rate;
+// ═══════════════════════════════════════
+// DIVISA POR TICKER
+// ═══════════════════════════════════════
+function detectCurrency(ticker) {
+  if (ticker.endsWith('.T'))  return 'JPY';
+  if (ticker.endsWith('.L'))  return 'GBP';
+  if (ticker.endsWith('.PA') || ticker.endsWith('.DE') || ticker.endsWith('.MC') ||
+      ticker.endsWith('.MI') || ticker.endsWith('.AS') || ticker.endsWith('.BR') ||
+      ticker.endsWith('.LS') || ticker.endsWith('.HE')) return 'EUR';
+  if (ticker.endsWith('.ST')) return 'SEK';
+  if (ticker.endsWith('.SW')) return 'CHF';
+  if (ticker.endsWith('.TO')) return 'CAD';
+  if (ticker.endsWith('.AX')) return 'AUD';
+  return 'USD';
 }
 
-// ═══════════════════════════════════════════════════════
-// PRECIOS DE ACCIONES (FINNHUB)
-// ═══════════════════════════════════════════════════════
-let priceCache = {};
+function isAutoPrice(currency) { return currency === 'USD'; }
 
+// Precio automático siempre en EUR (buyPrice ya está en EUR)
+// currentPrice en EUR:
+// - USD: precio Finnhub en USD * usdEurRate
+// - EUR: precio directo (Finnhub para .MC etc si hubiera, o manual)
+// - otros: manual
+
+function getCurrentPriceEur(pos) {
+  if (!isAutoPrice(pos.currency)) {
+    return pos.manualCurrentPrice != null ? pos.manualCurrentPrice : null;
+  }
+  const p = priceCache[pos.ticker];
+  if (!p || !usdEurRate) return null;
+  return p.c * usdEurRate;
+}
+
+function getPrevPriceEur(pos) {
+  if (!isAutoPrice(pos.currency)) return null;
+  const p = priceCache[pos.ticker];
+  if (!p || !usdEurRate) return null;
+  return p.pc * usdEurRate;
+}
+
+// ═══════════════════════════════════════
+// PRECIOS FINNHUB
+// ═══════════════════════════════════════
 async function fetchPrice(ticker) {
   try {
-    const r = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${FINNHUB_KEY}`);
+    const r = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${FINNHUB_KEY}`, { cache: 'no-store' });
     const d = await r.json();
-    if (d && d.c > 0) {
-      priceCache[ticker] = { c: d.c, pc: d.pc, dp: d.dp, d: d.d, ts: Date.now() };
-      return priceCache[ticker];
+    if (d && d.c && d.c > 0) {
+      priceCache[ticker] = { c: d.c, pc: d.pc, ts: Date.now() };
+      persist();
+      return true;
     }
   } catch(e) {}
-  return null;
+  return false;
 }
 
-async function fetchProfileCurrency(ticker) {
-  try {
-    const r = await fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${FINNHUB_KEY}`);
-    const d = await r.json();
-    return d.currency || 'USD';
-  } catch(e) { return 'USD'; }
-}
+async function refreshAllPrices(silent = false) {
+  const usdPos = positions.filter(p => isAutoPrice(p.currency));
+  if (!usdPos.length) return;
 
-async function refreshPrices() {
-  for (const pos of positions) {
-    const data = await fetchPrice(pos.ticker);
-    if (data) renderPositions();
+  if (!silent) setRefreshDot(true);
+
+  for (const pos of usdPos) {
+    await fetchPrice(pos.ticker);
   }
+
+  setRefreshDot(false);
+  renderAll();
+  updateRefreshLabel();
+}
+
+function setRefreshDot(active) {
+  document.getElementById('refresh-dot').className = active ? 'refresh-dot active' : 'refresh-dot';
+}
+
+function updateRefreshLabel() {
+  const now = new Date();
+  document.getElementById('refresh-label').textContent =
+    'Actualizado ' + now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
+
+function startAutoRefresh() {
+  clearInterval(autoRefreshTimer);
+  autoRefreshTimer = setInterval(() => {
+    refreshAllPrices(true);
+  }, AUTO_REFRESH_MS);
+}
+
+// ═══════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════
+function fmt(n, dec=2) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return n.toLocaleString('es-ES', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+function sign(n) { return n > 0 ? '+' : ''; }
+function cc(n) { return n > 0 ? 'c-green' : n < 0 ? 'c-red' : 'c-muted'; }
+
+function renderAll() {
+  renderPositions();
   renderSummary();
 }
 
-// ═══════════════════════════════════════════════════════
-// BÚSQUEDA DE EMPRESAS
-// ═══════════════════════════════════════════════════════
-async function searchSymbol(q) {
-  try {
-    const r = await fetch(`https://finnhub.io/api/v1/search?q=${encodeURIComponent(q)}&token=${FINNHUB_KEY}`);
-    const d = await r.json();
-    return (d.result || []).slice(0, 6).filter(x => x.type === 'Common Stock' || x.type === '');
-  } catch(e) { return []; }
+function renderPositions() {
+  const list = document.getElementById('positions-list');
+  list.innerHTML = '';
+
+  if (!positions.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📈</div>
+        <h3>Tu cartera está vacía</h3>
+        <p>Pulsa el botón + para añadir tu primera posición.</p>
+      </div>`;
+    return;
+  }
+
+  positions.forEach((pos, idx) => {
+    const curEur  = getCurrentPriceEur(pos);
+    const prevEur = getPrevPriceEur(pos);
+    const auto    = isAutoPrice(pos.currency);
+
+    const dayChgEur = (curEur && prevEur) ? (curEur - prevEur) * pos.shares : null;
+    const dayChgPct = (curEur && prevEur && prevEur > 0) ? ((curEur - prevEur) / prevEur) * 100 : null;
+    const curVal    = curEur ? curEur * pos.shares : null;
+    const pnl       = (curVal !== null && pos.capital) ? curVal - pos.capital : null;
+    const pnlPct    = (pnl !== null && pos.capital > 0) ? (pnl / pos.capital) * 100 : null;
+
+    const priceStr = curEur
+      ? fmt(curEur) + ' €'
+      : auto
+        ? '<span class="spinner"></span>'
+        : '<span style="color:var(--gold);font-size:12px">Sin precio</span>';
+
+    const changeStr = dayChgPct !== null
+      ? `${sign(dayChgPct)}${fmt(dayChgPct)}% · ${sign(dayChgEur)}${fmt(dayChgEur)} €`
+      : auto ? '—' : (pos.manualCurrentPrice ? '—' : 'Introduce precio →');
+
+    const card = document.createElement('div');
+    card.className = 'position-card';
+    card.innerHTML = `
+      <div class="pos-order-btns">
+        <button class="order-btn" ${idx===0?'disabled':''} onclick="movePos(${idx},-1)">↑</button>
+        <button class="order-btn" ${idx===positions.length-1?'disabled':''} onclick="movePos(${idx},1)">↓</button>
+      </div>
+      <div class="pos-info" onclick="openDetail(${idx})">
+        <div class="pos-name">${pos.name}</div>
+        <div class="pos-ticker">${pos.ticker} · ${pos.currency}</div>
+      </div>
+      <div class="pos-right" onclick="openDetail(${idx})">
+        <div class="pos-price">${priceStr}</div>
+        <div class="pos-change ${dayChgPct !== null ? cc(dayChgPct) : 'c-muted'}">${changeStr}</div>
+        <div class="pos-pnl ${pnl !== null ? cc(pnl) : 'c-muted'}">${pnl !== null ? sign(pnl)+fmt(pnl)+' €' : '—'}</div>
+      </div>`;
+    list.appendChild(card);
+  });
 }
 
+function renderSummary() {
+  let totalVal = 0, totalInv = 0, totalPrev = 0;
+  let hasPrice = false;
+
+  positions.forEach(pos => {
+    const cur  = getCurrentPriceEur(pos);
+    const prev = getPrevPriceEur(pos);
+    totalInv += pos.capital || 0;
+    if (cur !== null)  { totalVal  += cur  * pos.shares; hasPrice = true; }
+    if (prev !== null) { totalPrev += prev * pos.shares; }
+  });
+
+  const pnl       = hasPrice ? totalVal - totalInv : null;
+  const pnlPct    = (pnl !== null && totalInv > 0) ? (pnl / totalInv) * 100 : null;
+  const dayPnl    = (hasPrice && totalPrev) ? totalVal - totalPrev : null;
+  const dayPnlPct = (dayPnl !== null && totalPrev > 0) ? (dayPnl / totalPrev) * 100 : null;
+
+  document.getElementById('sum-total').textContent = hasPrice ? fmt(totalVal) + ' €' : '— €';
+
+  const de = document.getElementById('sum-day-eur');
+  de.textContent = dayPnl !== null ? `${sign(dayPnl)}${fmt(dayPnl)} €` : '—';
+  de.className = `s-value-sm ${dayPnl !== null ? cc(dayPnl) : 'c-muted'}`;
+
+  const dp = document.getElementById('sum-day-pct');
+  dp.textContent = dayPnlPct !== null ? `${sign(dayPnlPct)}${fmt(dayPnlPct)}%` : '—';
+  dp.className = `s-sub ${dayPnlPct !== null ? cc(dayPnlPct) : 'c-muted'}`;
+
+  const pe = document.getElementById('sum-pnl-eur');
+  pe.textContent = pnl !== null ? `${sign(pnl)}${fmt(pnl)} €` : '—';
+  pe.className = `s-value-sm ${pnl !== null ? cc(pnl) : 'c-muted'}`;
+
+  const pp = document.getElementById('sum-pnl-pct');
+  pp.textContent = pnlPct !== null ? `${sign(pnlPct)}${fmt(pnlPct)}%` : '—';
+  pp.className = `s-sub ${pnlPct !== null ? cc(pnlPct) : 'c-muted'}`;
+}
+
+function movePos(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= positions.length) return;
+  [positions[idx], positions[newIdx]] = [positions[newIdx], positions[idx]];
+  persist();
+  renderAll();
+}
+
+// ═══════════════════════════════════════
+// BÚSQUEDA
+// ═══════════════════════════════════════
 function onSearchInput() {
   const q = document.getElementById('search-input').value.trim();
   clearTimeout(searchTimeout);
-  if (q.length < 2) {
-    document.getElementById('search-results').classList.remove('open');
-    return;
-  }
+  if (q.length < 2) { document.getElementById('search-results').classList.remove('open'); return; }
   searchTimeout = setTimeout(async () => {
-    const results = await searchSymbol(q);
-    const el = document.getElementById('search-results');
-    if (!results.length) { el.classList.remove('open'); return; }
-    el.innerHTML = results.map(r =>
-      `<div class="search-result-item" onclick="selectCompany('${r.symbol}','${r.description.replace(/'/g,"\\'")}','${r.displaySymbol}')">
-        <span class="result-ticker">${r.displaySymbol}</span>
-        <span class="result-name">${r.description}</span>
-        <span class="result-exchange">${r.type || ''}</span>
-      </div>`
-    ).join('');
-    el.classList.add('open');
+    try {
+      const r = await fetch(`https://finnhub.io/api/v1/search?q=${encodeURIComponent(q)}&token=${FINNHUB_KEY}`);
+      const d = await r.json();
+      const results = (d.result || []).slice(0, 8);
+      const el = document.getElementById('search-results');
+      if (!results.length) { el.classList.remove('open'); return; }
+      el.innerHTML = results.map(res => {
+        const cur = detectCurrency(res.symbol);
+        const auto = isAutoPrice(cur);
+        return `<div class="search-result-item" onclick="selectCompany('${res.symbol.replace(/'/g,"\\'")}','${res.description.replace(/'/g,"\\'")}')">
+          <span class="result-ticker">${res.displaySymbol}</span>
+          <span class="result-name">${res.description}</span>
+          <span class="result-type">${cur}${auto ? '' : ' · manual'}</span>
+        </div>`;
+      }).join('');
+      el.classList.add('open');
+    } catch(e) {}
   }, 400);
 }
 
-let selectedTicker = null, selectedName = null, selectedCurrency = null;
+function selectCompany(ticker, name) {
+  selectedTicker  = ticker;
+  selectedName    = name;
+  selectedCurrency = detectCurrency(ticker);
 
-async function selectCompany(ticker, name, display) {
-  selectedTicker = ticker;
-  selectedName = name;
   document.getElementById('search-results').classList.remove('open');
   document.getElementById('search-input').value = '';
-
-  // Detectar divisa
-  selectedCurrency = await fetchProfileCurrency(ticker);
-
   document.getElementById('step-search').style.display = 'none';
   document.getElementById('step-data').style.display = 'block';
-  document.getElementById('add-sheet-title').textContent = name;
-  document.getElementById('selected-company-label').textContent = `${display} · ${selectedCurrency}`;
+  document.getElementById('add-title').textContent = name;
 
-  const hint = selectedCurrency !== 'EUR'
-    ? `Introduce el precio en ${selectedCurrency} (se convertirá a EUR automáticamente)`
-    : 'Introduce el precio en EUR';
-  document.getElementById('buy-price-currency-hint').textContent = hint;
+  const auto = isAutoPrice(selectedCurrency);
+  document.getElementById('selected-hint').innerHTML =
+    `<span>${ticker}</span> · ${selectedCurrency}${auto ? ' · Precio automático (Finnhub)' : ' · Precio manual'}`;
 
   document.getElementById('input-buy-price').value = '';
   document.getElementById('input-capital').value = '';
@@ -1192,264 +909,107 @@ async function selectCompany(ticker, name, display) {
 function backToSearch() {
   document.getElementById('step-search').style.display = 'block';
   document.getElementById('step-data').style.display = 'none';
-  document.getElementById('add-sheet-title').textContent = 'Añadir posición';
+  document.getElementById('add-title').textContent = 'Añadir posición';
   selectedTicker = null; selectedName = null; selectedCurrency = null;
 }
 
 function calcShares() {
-  const buyPrice = parseFloat(document.getElementById('input-buy-price').value);
-  const capital  = parseFloat(document.getElementById('input-capital').value);
-  if (!buyPrice || !capital || !selectedCurrency) { document.getElementById('calc-shares').textContent = '—'; return; }
-
-  const buyPriceEur = toEur(buyPrice, selectedCurrency);
-  if (!buyPriceEur) { document.getElementById('calc-shares').textContent = 'Sin tipo de cambio'; return; }
-
-  const shares = capital / buyPriceEur;
-  document.getElementById('calc-shares').textContent = shares.toFixed(4);
+  const bp  = parseFloat(document.getElementById('input-buy-price').value);
+  const cap = parseFloat(document.getElementById('input-capital').value);
+  if (!bp || !cap) { document.getElementById('calc-shares').textContent = '—'; return; }
+  // buyPrice siempre en EUR
+  document.getElementById('calc-shares').textContent = (cap / bp).toFixed(4);
   document.getElementById('input-shares-direct').value = '';
 }
 
 function onSharesDirect() {
-  document.getElementById('calc-shares').textContent = document.getElementById('input-shares-direct').value || '—';
+  document.getElementById('calc-shares').textContent =
+    document.getElementById('input-shares-direct').value || '—';
 }
 
 async function savePosition() {
-  const buyPrice = parseFloat(document.getElementById('input-buy-price').value);
-  const capital  = parseFloat(document.getElementById('input-capital').value);
-  const directShares = parseFloat(document.getElementById('input-shares-direct').value);
+  const bp  = parseFloat(document.getElementById('input-buy-price').value);
+  const cap = parseFloat(document.getElementById('input-capital').value);
+  const ds  = parseFloat(document.getElementById('input-shares-direct').value);
   const notes = document.getElementById('input-notes').value.trim();
 
-  if (!selectedTicker || !buyPrice) { alert('Introduce al menos el ticker y el precio de compra.'); return; }
+  if (!selectedTicker || !bp) { alert('Introduce el precio de compra.'); return; }
 
-  let shares = directShares || 0;
-  if (!shares && capital) {
-    const bpEur = toEur(buyPrice, selectedCurrency);
-    if (bpEur) shares = capital / bpEur;
-  }
+  let shares = ds || 0;
+  if (!shares && cap) shares = cap / bp;
 
   const pos = {
     id: Date.now(),
     ticker: selectedTicker,
     name: selectedName,
-    currency: selectedCurrency || 'USD',
-    buyPrice,
-    capital: capital || 0,
+    currency: selectedCurrency,
+    buyPrice: bp,      // siempre en EUR
+    capital: cap || 0,
     shares,
-    notes
+    notes,
+    manualCurrentPrice: null,
   };
 
   positions.push(pos);
-  save();
+  persist();
   closeAddSheet();
-  renderPositions();
-  renderSummary();
-  await fetchPrice(selectedTicker);
-  renderPositions();
-  renderSummary();
-}
+  renderAll(); // render inmediato con lo que hay
 
-// ═══════════════════════════════════════════════════════
-// RENDER LISTA
-// ═══════════════════════════════════════════════════════
-function fmt(n, decimals=2) {
-  if (n === null || n === undefined || isNaN(n)) return '—';
-  return n.toLocaleString('es-ES', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-}
-
-function colorClass(n) { return n > 0 ? 'c-green' : n < 0 ? 'c-red' : 'c-muted'; }
-function sign(n) { return n > 0 ? '+' : ''; }
-
-function renderPositions() {
-  const list = document.getElementById('positions-list');
-  const empty = document.getElementById('empty-state');
-
-  if (!positions.length) {
-    empty.style.display = 'block';
-    list.innerHTML = '';
-    list.appendChild(empty);
-    return;
+  // Cargar precio si es automático
+  if (isAutoPrice(selectedCurrency)) {
+    await fetchPrice(selectedTicker);
+    renderAll(); // segundo render con precio
   }
-
-  empty.style.display = 'none';
-  list.innerHTML = '';
-
-  positions.forEach((pos, idx) => {
-    const price = priceCache[pos.ticker];
-    const currentPriceNative = price ? price.c : null;
-    const prevPriceNative    = price ? price.pc : null;
-    const currentPriceEur    = currentPriceNative ? toEur(currentPriceNative, pos.currency) : null;
-    const prevPriceEur       = prevPriceNative    ? toEur(prevPriceNative, pos.currency)    : null;
-
-    const dayChangeEur = (currentPriceEur && prevPriceEur) ? (currentPriceEur - prevPriceEur) * pos.shares : null;
-    const dayChangePct = (currentPriceEur && prevPriceEur && prevPriceEur > 0) ? ((currentPriceEur - prevPriceEur) / prevPriceEur) * 100 : null;
-
-    const currentValue = currentPriceEur ? currentPriceEur * pos.shares : null;
-    const pnl = currentValue ? currentValue - pos.capital : null;
-    const pnlPct = (pnl !== null && pos.capital > 0) ? (pnl / pos.capital) * 100 : null;
-
-    const priceStr = currentPriceEur ? fmt(currentPriceEur) + ' €' : '<span class="spinner"></span>';
-    const changeStr = dayChangePct !== null
-      ? `${sign(dayChangePct)}${fmt(dayChangePct)}% · ${sign(dayChangeEur)}${fmt(dayChangeEur)} €`
-      : '—';
-    const pnlStr = pnl !== null ? `${sign(pnl)}${fmt(pnl)} € (${sign(pnlPct)}${fmt(pnlPct)}%)` : '—';
-
-    const card = document.createElement('div');
-    card.className = 'position-card';
-    card.dataset.idx = idx;
-    card.innerHTML = `
-      <div class="drag-handle" data-idx="${idx}">
-        <svg width="14" height="20" viewBox="0 0 14 20" fill="none">
-          <circle cx="4" cy="4"  r="1.5" fill="#555"/>
-          <circle cx="10" cy="4"  r="1.5" fill="#555"/>
-          <circle cx="4" cy="10" r="1.5" fill="#555"/>
-          <circle cx="10" cy="10" r="1.5" fill="#555"/>
-          <circle cx="4" cy="16" r="1.5" fill="#555"/>
-          <circle cx="10" cy="16" r="1.5" fill="#555"/>
-        </svg>
-      </div>
-      <div class="position-info">
-        <div class="position-name">${pos.name}</div>
-        <div class="position-ticker">${pos.ticker} · ${pos.currency}</div>
-      </div>
-      <div class="position-right">
-        <div class="position-price">${priceStr}</div>
-        <div class="position-change ${dayChangePct !== null ? colorClass(dayChangePct) : 'c-muted'}">${changeStr}</div>
-        <div class="position-pnl ${pnl !== null ? colorClass(pnl) : 'c-muted'}">${pnl !== null ? sign(pnl) + fmt(pnl) + ' €' : '—'}</div>
-      </div>
-    `;
-
-    // Click para abrir detalle (solo en la zona info/right, no en el handle)
-    card.querySelector('.position-info').addEventListener('click', () => openDetail(idx));
-    card.querySelector('.position-right').addEventListener('click', () => openDetail(idx));
-
-    // Drag & drop táctil
-    setupDrag(card, idx);
-
-    list.appendChild(card);
-  });
-
-  renderSummary();
 }
 
-// ═══════════════════════════════════════════════════════
-// DRAG & DROP
-// ═══════════════════════════════════════════════════════
-let dragIdx = null, dragOverIdx = null;
-
-function setupDrag(card, idx) {
-  const handle = card.querySelector('.drag-handle');
-  let startY, startIdx, clone;
-
-  handle.addEventListener('touchstart', e => {
-    e.stopPropagation();
-    startY = e.touches[0].clientY;
-    startIdx = idx;
-    dragIdx = idx;
-    card.classList.add('dragging');
-  }, { passive: true });
-
-  handle.addEventListener('touchmove', e => {
-    e.preventDefault();
-    const y = e.touches[0].clientY;
-    const cards = [...document.querySelectorAll('.position-card')];
-    let target = null;
-    cards.forEach((c, i) => {
-      if (c === card) return;
-      const rect = c.getBoundingClientRect();
-      if (y > rect.top && y < rect.bottom) { target = i; c.classList.add('drag-over'); }
-      else c.classList.remove('drag-over');
-    });
-    dragOverIdx = target;
-  }, { passive: false });
-
-  handle.addEventListener('touchend', () => {
-    card.classList.remove('dragging');
-    document.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over'));
-    if (dragOverIdx !== null && dragOverIdx !== dragIdx) {
-      const moved = positions.splice(dragIdx, 1)[0];
-      positions.splice(dragOverIdx, 0, moved);
-      save();
-      renderPositions();
-    }
-    dragIdx = null; dragOverIdx = null;
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// RESUMEN GLOBAL
-// ═══════════════════════════════════════════════════════
-function renderSummary() {
-  let totalValue = 0, totalInvested = 0, totalPrevValue = 0;
-  let allPriced = true;
-
-  positions.forEach(pos => {
-    const price = priceCache[pos.ticker];
-    const cur = price ? toEur(price.c, pos.currency) : null;
-    const prev = price ? toEur(price.pc, pos.currency) : null;
-    if (cur) { totalValue += cur * pos.shares; }
-    else allPriced = false;
-    if (prev) totalPrevValue += prev * pos.shares;
-    totalInvested += pos.capital;
-  });
-
-  const totalPnl = totalValue - totalInvested;
-  const totalPnlPct = totalInvested > 0 ? (totalPnl / totalInvested) * 100 : 0;
-  const dayPnl = totalValue - totalPrevValue;
-  const dayPnlPct = totalPrevValue > 0 ? (dayPnl / totalPrevValue) * 100 : 0;
-
-  document.getElementById('sum-total').textContent = allPriced ? fmt(totalValue) + ' €' : '— €';
-  document.getElementById('sum-day-eur').textContent = totalPrevValue ? `${sign(dayPnl)}${fmt(dayPnl)} €` : '—';
-  document.getElementById('sum-day-eur').className = `summary-value ${colorClass(dayPnl)}`;
-  document.getElementById('sum-day-pct').textContent = totalPrevValue ? `${sign(dayPnlPct)}${fmt(dayPnlPct)}%` : '—';
-  document.getElementById('sum-day-pct').className = `summary-value ${colorClass(dayPnlPct)}`;
-  document.getElementById('sum-total-eur').textContent = totalInvested ? `${sign(totalPnl)}${fmt(totalPnl)} €` : '—';
-  document.getElementById('sum-total-eur').className = `summary-value ${colorClass(totalPnl)}`;
-  document.getElementById('sum-total-pct').textContent = totalInvested ? `${sign(totalPnlPct)}${fmt(totalPnlPct)}%` : '—';
-  document.getElementById('sum-total-pct').className = `summary-value ${colorClass(totalPnlPct)}`;
-}
-
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // DETALLE
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 function openDetail(idx) {
   currentDetail = idx;
-  const pos = positions[idx];
-  const price = priceCache[pos.ticker];
+  const pos  = positions[idx];
+  const auto = isAutoPrice(pos.currency);
+  const curEur  = getCurrentPriceEur(pos);
+  const prevEur = getPrevPriceEur(pos);
 
-  document.getElementById('detail-company').textContent = pos.name;
-  document.getElementById('detail-ticker').textContent = pos.ticker + ' · ' + pos.currency;
+  document.getElementById('d-company').textContent = pos.name;
+  const badge = document.getElementById('d-badge');
+  badge.textContent = `${pos.ticker} · ${pos.currency}`;
+  badge.className = auto ? 'detail-badge' : 'detail-badge manual-price-badge';
 
-  const curEur = price ? toEur(price.c, pos.currency) : null;
-  const prevEur = price ? toEur(price.pc, pos.currency) : null;
-  const dayChgEur = (curEur && prevEur) ? (curEur - prevEur) : null;
-  const dayChgPct = (curEur && prevEur && prevEur > 0) ? ((curEur - prevEur) / prevEur) * 100 : null;
+  document.getElementById('d-price').textContent = curEur ? fmt(curEur) + ' €' : '—';
 
-  document.getElementById('detail-price').textContent = curEur ? fmt(curEur) + ' €' : '—';
-  if (dayChgEur !== null) {
-    document.getElementById('detail-change').textContent = `${sign(dayChgPct)}${fmt(dayChgPct)}% · ${sign(dayChgEur)}${fmt(dayChgEur)} € hoy`;
-    document.getElementById('detail-change').className = `detail-change ${colorClass(dayChgEur)}`;
+  if (!auto) {
+    document.getElementById('d-change').textContent = 'Precio manual';
+    document.getElementById('d-change').className = 'd-change c-muted';
+    document.getElementById('d-manual-price-block').style.display = 'block';
+    document.getElementById('d-manual-label').textContent = 'Precio actual (EUR)';
+    document.getElementById('d-manual-curr').textContent = 'EUR';
+    document.getElementById('d-manual-input').value = pos.manualCurrentPrice || '';
   } else {
-    document.getElementById('detail-change').textContent = '—';
-    document.getElementById('detail-change').className = 'detail-change c-muted';
+    const dc = (curEur && prevEur) ? (curEur - prevEur) : null;
+    const dp = (dc !== null && prevEur > 0) ? (dc / prevEur) * 100 : null;
+    document.getElementById('d-change').textContent = dp !== null
+      ? `${sign(dp)}${fmt(dp)}% · ${sign(dc)}${fmt(dc)} € hoy` : '—';
+    document.getElementById('d-change').className = `d-change ${dp !== null ? cc(dp) : 'c-muted'}`;
+    document.getElementById('d-manual-price-block').style.display = 'none';
   }
 
-  const buyPriceEur = toEur(pos.buyPrice, pos.currency);
-  document.getElementById('detail-invested').textContent = fmt(pos.capital) + ' €';
-  document.getElementById('detail-shares').textContent = parseFloat(pos.shares.toFixed(6)) + ' acc.';
-  document.getElementById('detail-buy-price').textContent = buyPriceEur ? fmt(buyPriceEur) + ' €' : '—';
+  document.getElementById('d-invested').textContent  = fmt(pos.capital) + ' €';
+  document.getElementById('d-shares').textContent    = parseFloat(pos.shares.toFixed(6)) + ' acc.';
+  document.getElementById('d-buy-price').textContent = fmt(pos.buyPrice) + ' €';
+  const curVal = curEur ? curEur * pos.shares : null;
+  document.getElementById('d-cur-value').textContent = curVal ? fmt(curVal) + ' €' : '—';
 
-  const currentValue = curEur ? curEur * pos.shares : null;
-  document.getElementById('detail-current-value').textContent = currentValue ? fmt(currentValue) + ' €' : '—';
-
-  const pnl = currentValue ? currentValue - pos.capital : null;
+  const pnl    = (curVal !== null && pos.capital) ? curVal - pos.capital : null;
   const pnlPct = (pnl !== null && pos.capital > 0) ? (pnl / pos.capital) * 100 : null;
-  document.getElementById('detail-pnl-eur').textContent = pnl !== null ? `${sign(pnl)}${fmt(pnl)} €` : '—';
-  document.getElementById('detail-pnl-eur').className = `pnl-eur ${pnl !== null ? colorClass(pnl) : 'c-muted'}`;
-  document.getElementById('detail-pnl-pct').textContent = pnlPct !== null ? `${sign(pnlPct)}${fmt(pnlPct)}%` : '—';
-  document.getElementById('detail-pnl-pct').className = `pnl-pct ${pnlPct !== null ? colorClass(pnlPct) : 'c-muted'}`;
 
-  document.getElementById('detail-notes').value = pos.notes || '';
+  document.getElementById('d-pnl-eur').textContent = pnl !== null ? `${sign(pnl)}${fmt(pnl)} €` : '—';
+  document.getElementById('d-pnl-eur').className = `pnl-eur ${pnl !== null ? cc(pnl) : 'c-muted'}`;
+  document.getElementById('d-pnl-pct').textContent = pnlPct !== null ? `${sign(pnlPct)}${fmt(pnlPct)}%` : '—';
+  document.getElementById('d-pnl-pct').className = `pnl-pct ${pnlPct !== null ? cc(pnlPct) : 'c-muted'}`;
 
+  document.getElementById('d-notes').value = pos.notes || '';
   document.getElementById('detail-screen').classList.add('open');
 }
 
@@ -1458,46 +1018,50 @@ function closeDetail() {
   currentDetail = null;
 }
 
+function applyManualPrice() {
+  if (currentDetail === null) return;
+  const val = parseFloat(document.getElementById('d-manual-input').value);
+  if (!val || val <= 0) { alert('Introduce un precio válido.'); return; }
+  positions[currentDetail].manualCurrentPrice = val;
+  persist();
+  openDetail(currentDetail);
+  renderAll();
+}
+
 function saveNotes() {
   if (currentDetail === null) return;
-  positions[currentDetail].notes = document.getElementById('detail-notes').value;
-  save();
+  positions[currentDetail].notes = document.getElementById('d-notes').value;
+  persist();
 }
 
 function confirmDelete() {
   if (!confirm(`¿Eliminar ${positions[currentDetail].name} de la cartera?`)) return;
   positions.splice(currentDetail, 1);
-  save();
+  persist();
   closeDetail();
-  renderPositions();
+  renderAll();
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // EDITAR
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 function openEditSheet() {
   if (currentDetail === null) return;
   const pos = positions[currentDetail];
   document.getElementById('edit-buy-price').value = pos.buyPrice;
-  document.getElementById('edit-capital').value = pos.capital || '';
+  document.getElementById('edit-capital').value   = pos.capital || '';
   document.getElementById('edit-calc-shares').textContent = parseFloat(pos.shares.toFixed(6));
   document.getElementById('edit-shares-direct').value = '';
-  document.getElementById('edit-currency-hint').textContent =
-    pos.currency !== 'EUR' ? `Precio en ${pos.currency}` : 'Precio en EUR';
   document.getElementById('overlay-edit').classList.add('open');
 }
 
 function closeEditSheet() { document.getElementById('overlay-edit').classList.remove('open'); }
 
 function editCalcShares() {
-  if (currentDetail === null) return;
-  const pos = positions[currentDetail];
-  const bp = parseFloat(document.getElementById('edit-buy-price').value);
+  const bp  = parseFloat(document.getElementById('edit-buy-price').value);
   const cap = parseFloat(document.getElementById('edit-capital').value);
   if (!bp || !cap) return;
-  const bpEur = toEur(bp, pos.currency);
-  if (!bpEur) return;
-  document.getElementById('edit-calc-shares').textContent = (cap / bpEur).toFixed(4);
+  document.getElementById('edit-calc-shares').textContent = (cap / bp).toFixed(4);
   document.getElementById('edit-shares-direct').value = '';
 }
 
@@ -1509,71 +1073,64 @@ function editOnSharesDirect() {
 function saveEdit() {
   if (currentDetail === null) return;
   const pos = positions[currentDetail];
-  const bp = parseFloat(document.getElementById('edit-buy-price').value);
+  const bp  = parseFloat(document.getElementById('edit-buy-price').value);
   const cap = parseFloat(document.getElementById('edit-capital').value);
-  const directShares = parseFloat(document.getElementById('edit-shares-direct').value);
-
+  const ds  = parseFloat(document.getElementById('edit-shares-direct').value);
   if (!bp) { alert('Introduce el precio de compra.'); return; }
-
   pos.buyPrice = bp;
-  pos.capital = cap || pos.capital;
-
-  if (directShares) {
-    pos.shares = directShares;
-  } else if (cap) {
-    const bpEur = toEur(bp, pos.currency);
-    if (bpEur) pos.shares = cap / bpEur;
-  }
-
-  save();
+  pos.capital  = cap || pos.capital;
+  pos.shares   = ds || (cap ? cap / bp : pos.shares);
+  persist();
   closeEditSheet();
   openDetail(currentDetail);
-  renderPositions();
+  renderAll();
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 // ADD SHEET
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════
 function openAddSheet() {
   document.getElementById('overlay-add').classList.add('open');
   document.getElementById('step-search').style.display = 'block';
   document.getElementById('step-data').style.display = 'none';
-  document.getElementById('add-sheet-title').textContent = 'Añadir posición';
+  document.getElementById('add-title').textContent = 'Añadir posición';
   document.getElementById('search-input').value = '';
   document.getElementById('search-results').classList.remove('open');
   selectedTicker = null; selectedName = null; selectedCurrency = null;
-  setTimeout(() => document.getElementById('search-input').focus(), 300);
+  setTimeout(() => document.getElementById('search-input').focus(), 350);
 }
 
 function closeAddSheet() { document.getElementById('overlay-add').classList.remove('open'); }
 
-// ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
-async function init() {
-  load();
-
-  // Restaurar toggles manuales
-  ['usd','gbp','jpy'].forEach(key => {
-    if (manualRates[key]) {
-      document.getElementById(`toggle-${key}`).checked = true;
-      document.getElementById(`manual-${key}`).className = 'manual-wrap open';
-      const badge = document.getElementById(`rate-${key}-badge`);
-      badge.className = 'rate-badge badge-manual';
-      badge.textContent = 'manual';
-    }
-  });
-
-  // Cargar tipos de cambio automáticos
-  await Promise.all(['USD','GBP','JPY'].map(c => fetchRate(c)));
-
-  // Cargar precios de posiciones existentes
-  renderPositions();
-  if (positions.length) {
-    await Promise.all(positions.map(p => fetchPrice(p.ticker)));
-    renderPositions();
-    renderSummary();
+// ═══════════════════════════════════════
+// VISIBILIDAD (volver desde segundo plano)
+// ═══════════════════════════════════════
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    if (!isManual) fetchRate();
+    refreshAllPrices(true);
   }
+});
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+async function init() {
+  restore();
+  renderAll();
+
+  // Tipo de cambio
+  if (!isManual) {
+    await fetchRate();
+  } else {
+    renderAll();
+  }
+
+  // Precios iniciales
+  await refreshAllPrices();
+
+  // Auto-refresh cada 2 minutos
+  startAutoRefresh();
 }
 
 init();
