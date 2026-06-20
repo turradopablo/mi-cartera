@@ -359,6 +359,16 @@ svg.icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-w
         <span class="manual-unit">EUR</span>
       </div>
     </div>
+    <div style="display:flex; align-items:center; gap:10px; margin-top:10px; padding-top:10px; border-top:0.5px solid var(--border);">
+      <label style="font-size:13px; color:var(--muted); flex:1;">Ajuste spread TR</label>
+      <input type="number" id="spread-adjust" placeholder="0.0000" step="0.0001"
+        value="0" min="-0.1" max="0.1" inputmode="decimal"
+        style="width:90px; background:var(--bg3); border:0.5px solid var(--border);
+               border-radius:var(--radius-sm); color:var(--text); font-size:15px;
+               font-weight:500; padding:6px 10px; outline:none; text-align:right;
+               font-family:inherit;"
+        oninput="onSpreadChange()">
+    </div>
   </div>
 </div>
 
@@ -523,6 +533,7 @@ const RATE_RETRY_MS   = 60000;  // reintentar tipo cambio cada 60s si falla
 // ═══════════════════════════════════════
 let positions    = [];
 let usdEurRate   = null;
+let spreadAdjust = 0;
 let isManual     = false;
 let priceCache   = {};
 let currentDetail = null;
@@ -539,6 +550,7 @@ function persist() {
     localStorage.setItem('crt_positions', JSON.stringify(positions));
     localStorage.setItem('crt_prices',    JSON.stringify(priceCache));
     localStorage.setItem('crt_manual',    isManual ? '1' : '0');
+    localStorage.setItem('crt_spread',    spreadAdjust.toString());
     const mv = document.getElementById('manual-rate').value;
     if (mv) localStorage.setItem('crt_manual_rate', mv);
   } catch(e) {}
@@ -550,8 +562,13 @@ function restore() {
     const pc = localStorage.getItem('crt_prices');
     const m  = localStorage.getItem('crt_manual');
     const mv = localStorage.getItem('crt_manual_rate');
+    const sp = localStorage.getItem('crt_spread');
     if (p)  positions   = JSON.parse(p);
     if (pc) priceCache  = JSON.parse(pc);
+    if (sp !== null) {
+      spreadAdjust = parseFloat(sp) || 0;
+      document.getElementById('spread-adjust').value = spreadAdjust;
+    }
     isManual = m === '1';
     if (isManual && mv) {
       usdEurRate = parseFloat(mv);
@@ -559,10 +576,25 @@ function restore() {
       document.getElementById('manual-wrap').className = 'manual-wrap open';
       document.getElementById('manual-rate').value = mv;
       setRateBadge('manual');
-      document.getElementById('rate-number').textContent = parseFloat(mv).toFixed(4);
+      document.getElementById('rate-number').textContent = effectiveRate().toFixed(4);
       document.getElementById('rate-date').textContent = 'Tipo de cambio manual';
     }
   } catch(e) {}
+}
+
+// ═══════════════════════════════════════
+// TIPO DE CAMBIO EFECTIVO
+// ═══════════════════════════════════════
+function effectiveRate() {
+  if (!usdEurRate) return null;
+  return Math.max(0.01, usdEurRate - spreadAdjust);
+}
+
+function onSpreadChange() {
+  const val = parseFloat(document.getElementById('spread-adjust').value);
+  spreadAdjust = isNaN(val) ? 0 : val;
+  persist();
+  renderAll();
 }
 
 // ═══════════════════════════════════════
@@ -614,7 +646,7 @@ async function fetchRate(force = false) {
       const { rate, date } = await fn();
       if (rate && rate > 0) {
         usdEurRate = rate;
-        document.getElementById('rate-number').textContent = rate.toFixed(4);
+        document.getElementById('rate-number').textContent = effectiveRate().toFixed(4);
         document.getElementById('rate-date').textContent = date;
         setRateBadge('ok');
         renderAll();
@@ -650,7 +682,7 @@ function applyManualRate() {
   const val = parseFloat(document.getElementById('manual-rate').value);
   if (val && val > 0) {
     usdEurRate = val;
-    document.getElementById('rate-number').textContent = val.toFixed(4);
+    document.getElementById('rate-number').textContent = effectiveRate().toFixed(4);
     renderAll();
     persist();
   }
@@ -685,15 +717,17 @@ function getCurrentPriceEur(pos) {
     return pos.manualCurrentPrice != null ? pos.manualCurrentPrice : null;
   }
   const p = priceCache[pos.ticker];
-  if (!p || !usdEurRate) return null;
-  return p.c * usdEurRate;
+  const rate = effectiveRate();
+  if (!p || !rate) return null;
+  return p.c * rate;
 }
 
 function getPrevPriceEur(pos) {
   if (!isAutoPrice(pos.currency)) return null;
   const p = priceCache[pos.ticker];
-  if (!p || !usdEurRate) return null;
-  return p.pc * usdEurRate;
+  const rate = effectiveRate();
+  if (!p || !rate) return null;
+  return p.pc * rate;
 }
 
 // ═══════════════════════════════════════
