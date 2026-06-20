@@ -59,9 +59,10 @@ body {
   padding-bottom: 14px;
   border-bottom: 0.5px solid var(--border);
 }
-.summary-total { grid-column: span 2; margin-bottom: 4px; }
+.summary-total { grid-column: span 2; margin-bottom: 2px; }
 .s-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
-.s-value { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+.s-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+.s-capital { font-size: 13px; color: var(--dim); margin-top: 1px; margin-bottom: 6px; }
 .s-value-sm { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
 .s-sub { font-size: 13px; font-weight: 500; margin-top: 1px; }
 .c-green { color: var(--green); }
@@ -296,11 +297,11 @@ body {
 .notes-textarea:focus { border-color: var(--blue); }
 .notes-textarea::placeholder { color: var(--dim); }
 
-.manual-price-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-.manual-price-row label { font-size: 13px; color: var(--muted); white-space: nowrap; }
-.manual-price-row input { flex: 1; background: var(--bg3); border: 0.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 17px; font-weight: 500; padding: 8px 12px; outline: none; text-align: right; font-family: inherit; }
+.manual-price-row { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.manual-price-row label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.manual-price-row input { width: 100%; background: var(--bg3); border: 0.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 20px; font-weight: 500; padding: 10px 14px; outline: none; font-family: inherit; }
 .manual-price-row input:focus { border-color: var(--gold); }
-.manual-price-row .curr { font-size: 13px; color: var(--muted); }
+.manual-price-row .curr { display: none; }
 
 svg.icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; flex-shrink: 0; }
 </style>
@@ -315,16 +316,17 @@ svg.icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-w
     <div class="summary-total">
       <div class="s-label">Valor total</div>
       <div class="s-value c-text" id="sum-total">— €</div>
+      <div class="s-capital" id="sum-capital">—</div>
+    </div>
+    <div>
+      <div class="s-label">Beneficio total</div>
+      <div class="s-value-sm c-muted" id="sum-pnl-eur">—</div>
+      <div class="s-sub c-muted" id="sum-pnl-pct">—</div>
     </div>
     <div>
       <div class="s-label">Hoy</div>
       <div class="s-value-sm c-muted" id="sum-day-eur">—</div>
       <div class="s-sub c-muted" id="sum-day-pct">—</div>
-    </div>
-    <div>
-      <div class="s-label">Total</div>
-      <div class="s-value-sm c-muted" id="sum-pnl-eur">—</div>
-      <div class="s-sub c-muted" id="sum-pnl-pct">—</div>
     </div>
   </div>
 
@@ -802,6 +804,7 @@ function renderPositions() {
       <div class="pos-info" onclick="openDetail(${idx})">
         <div class="pos-name">${pos.name}</div>
         <div class="pos-ticker">${pos.ticker} · ${pos.currency}</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px">${pos.capital ? fmt(pos.capital) + ' € invertidos' : ''}</div>
       </div>
       <div class="pos-right" onclick="openDetail(${idx})">
         <div class="pos-price">${priceStr}</div>
@@ -830,6 +833,7 @@ function renderSummary() {
   const dayPnlPct = (dayPnl !== null && totalPrev > 0) ? (dayPnl / totalPrev) * 100 : null;
 
   document.getElementById('sum-total').textContent = hasPrice ? fmt(totalVal) + ' €' : '— €';
+  document.getElementById('sum-capital').textContent = totalInv ? fmt(totalInv) + ' €' : '—';
 
   const de = document.getElementById('sum-day-eur');
   de.textContent = dayPnl !== null ? `${sign(dayPnl)}${fmt(dayPnl)} €` : '—';
